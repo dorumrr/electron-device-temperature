@@ -32,7 +32,8 @@ const createWindow = () => {
     backgroundColor: '#f1f1f1',
     show: false,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      contextIsolation: false
   }
   })
   mainWindow.loadURL(
@@ -66,10 +67,14 @@ app.on("activate", () => {
   }
 })
 
-ipcMain.handle('cpu-temperature', (event, arg) => si.cpuTemperature()
-  .then(data => data)
-  .catch(error => {
+const getCPUTenperature = () => {
+  let temperatures
+  try {
+    temperatures = si.cpuTemperature()
+  } catch (error) {
     console.error(error)
-    return null;
-  })
-)
+  }
+  return temperatures
+}
+
+ipcMain.handle('cpu-temperature', (event, arg) => getCPUTenperature());
