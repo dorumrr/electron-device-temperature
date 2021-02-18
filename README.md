@@ -1,6 +1,6 @@
 # Electron Device Temperature
 
-This electron app reads the current CPU temperature from the device is running on?
+This electron app reads the current CPU temperature from the device is running on
 ## Development Setup
 
 Clone the repository
