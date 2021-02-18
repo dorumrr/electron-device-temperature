@@ -19,20 +19,23 @@
     "@testing-library/user-event": "^12.1.10",
     "cross-env": "^7.0.3",
     "electron-is-dev": "^1.2.0",
+    "osx-temperature-sensor": "^1.0.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.2",
+    "systeminformation": "^5.3.3",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "concurrently \"cross-env BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\"",
-    "release": "yarn react-build && electron-builder --publish=never",
-    "build": "yarn react-build && yarn electron-build",
+    "dev-setup": "rm -rf node_modules package-lock.json yarn.lock && npm i && ./node_modules/.bin/electron-rebuild",
+    "start": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "release": "npm run react-build && electron-builder --publish=never",
+    "build": "npm run react-build && npm run electron-build",
     "electron-build": "electron-builder",
     "react-start": "react-scripts start",
     "react-build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom"
-    },
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -55,6 +58,7 @@
     "concurrently": "^5.3.0",
     "electron": "^11.2.3",
     "electron-builder": "^22.9.1",
+    "electron-rebuild": "^2.3.5",
     "wait-on": "^5.2.1"
   }
 }

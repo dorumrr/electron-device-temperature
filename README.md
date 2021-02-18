@@ -12,11 +12,11 @@ npm v7.5.3
 
 Clone the repository
 
-Run `yarn install` 
+Run `npm install` 
 
-Run `yarn start`
+Run `npm start`
 ## Build 
 
-Run `yarn run release`
+Run `npm run release`
 
 Executables/Installers will be in `dist` folder.
