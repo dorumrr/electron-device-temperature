@@ -1,6 +1,17 @@
 {
   "name": "electron-device-temperature",
+  "description": "Interview test",
   "version": "0.1.0",
+  "author": {
+    "name": "Doru Moraru",
+    "email": "hello@doru.uk",
+    "url": "htpps://doru.uk"
+  },
+  "build": {
+    "appId": "uk.doru.electron-device-temperature"
+  },
+  "main": "public/electron.js",
+  "homepage": "./",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -14,11 +25,14 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+    "start": "concurrently \"cross-env BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "release": "yarn react-build && electron-builder --publish=never",
+    "build": "yarn react-build && yarn electron-build",
+    "electron-build": "electron-builder",
+    "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
+    "react-test": "react-scripts test --env=jsdom"
+    },
   "eslintConfig": {
     "extends": [
       "react-app",
