@@ -32,6 +32,10 @@ const createWindow = () => {
       : `file://${path.join(__dirname, "../build/index.html")}`
   )
   mainWindow.on("closed", () => (mainWindow = null))
+  if (isDev) {
+    // Open Console in development mode
+    mainWindow.webContents.openDevTools()
+  }
 }
 
 app.on("ready", createWindow)
