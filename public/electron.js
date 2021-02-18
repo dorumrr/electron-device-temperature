@@ -26,8 +26,8 @@ if (!singleInstanceLock) {
 }
 
 const createWindow = () => {
-  mainWindow = new BrowserWindow({ 
-    width: 700, 
+  mainWindow = new BrowserWindow({
+    width: 700,
     height: 500,
     maximizable: false,
     backgroundColor: '#000000',
@@ -35,7 +35,7 @@ const createWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
-  }
+    }
   })
   mainWindow.loadURL(
     isDev
@@ -47,11 +47,11 @@ const createWindow = () => {
   })
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
-})
+  })
 
-  mainWindow.webContents.on('did-finish-load', function() {
+  mainWindow.webContents.on('did-finish-load', function () {
     mainWindow.webContents.insertCSS('html,body{ overflow: hidden !important; }')
-  });
+  })
 
   if (isDev) {
     // Open Console in development mode
@@ -85,12 +85,26 @@ const getCPUTenperature = () => {
 
 ipcMain.on('cpu-temperature', async event => {
   event.returnValue = await getCPUTenperature()
-});
+})
 
-const getOutdoorTemperature = () => {
-  // 
-}
+const getOutdoorTemperature = () => new Promise(resolve => {
+  const request = net.request('https://fcc-weather-api.glitch.me/api/current?lat=51&lon=1') // Currently London. TODO: Get location automatically
+  let body = ''
+  request.on('response', (response) => {
+    response.on('data', chunk => body += chunk)
+    response.on('end', () => {
+      body = JSON.parse(body) || {}
+      if (body.main && body.main.temp) {
+        body = body.main.temp
+        resolve(Math.round(body))
+        return
+      }
+      resolve('error')
+    })
+  })
+  request.end()
+})
 
 ipcMain.on('outdoor-temperature', async event => {
   event.returnValue = await getOutdoorTemperature()
-});
+})

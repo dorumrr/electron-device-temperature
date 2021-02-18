@@ -13,11 +13,9 @@ const App = () => {
     try {
       const result = await ipcRenderer.sendSync('cpu-temperature')
       setCpuTemperature(result)
-      setError(null)
-      console.log(new Date().toISOString(), result)
       setTimeout(getCpuTemperature, 5000)
-    } catch (error) {
-      console.error(error)
+    } catch (e) {
+      console.error(e)
       setError('Could not read CPU Temperature, retrying...')
       setTimeout(getCpuTemperature, 10000)
     }
@@ -26,14 +24,16 @@ const App = () => {
   const getOutdoorTemperature = async () => {
     try {
       const result = await ipcRenderer.sendSync('outdoor-temperature')
-      setOutdoorTemperature(result)
-      setError(null)
-      console.log(new Date().toISOString(), result)
-      setTimeout(getOutdoorTemperature, 1000*60*30) // 30 minutes
-    } catch (error) {
-      console.error(error)
+      if (result === 'error' || !Number(result)) {
+        setError('Could not get Outdoor Temperature, retrying...')
+      } else {
+        setOutdoorTemperature(result)
+      }
+      setTimeout(getOutdoorTemperature, 1000 * 60 * 30) // 30 minutes
+    } catch (e) {
+      console.error(e)
       setError('Could not get Outdoor Temperature, retrying...')
-      setTimeout(getCpuTemperature, 1000*60) // 1 minute
+      setTimeout(getCpuTemperature, 1000 * 60) // 1 minute
     }
   }
 
@@ -58,7 +58,7 @@ const App = () => {
         </div>
         <div className="my-4 badge rounded-pill bg-secondary text-white p-2">CPU Temperature</div>
       </div>
-      
+
       <div>
         <div className="ml-4">
           <Thermometer
@@ -74,7 +74,7 @@ const App = () => {
       </div>
 
     </div>
-    {error ? <RB.Alert variant="danger" className="fixed-bottom m-0">{error}</RB.Alert> : ''}
+    {error ? <RB.Alert variant="danger" dismissible onClick={() => setError(null)} className="fixed-top m-2">{error}</RB.Alert> : ''}
   </div>)
 }
 
