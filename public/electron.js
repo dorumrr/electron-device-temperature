@@ -1,6 +1,7 @@
 const electron = require('electron')
 const app = electron.app
 const ipcMain = electron.ipcMain
+const net = electron.net
 const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -26,10 +27,10 @@ if (!singleInstanceLock) {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({ 
-    width: 400, 
-    height: 300,
+    width: 700, 
+    height: 500,
     maximizable: false,
-    backgroundColor: '#f1f1f1',
+    backgroundColor: '#000000',
     show: false,
     webPreferences: {
       nodeIntegration: true,
@@ -47,6 +48,11 @@ const createWindow = () => {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
 })
+
+  mainWindow.webContents.on('did-finish-load', function() {
+    mainWindow.webContents.insertCSS('html,body{ overflow: hidden !important; }')
+  });
+
   if (isDev) {
     // Open Console in development mode
     mainWindow.webContents.openDevTools()
@@ -77,4 +83,14 @@ const getCPUTenperature = () => {
   return temperatures
 }
 
-ipcMain.handle('cpu-temperature', (event, arg) => getCPUTenperature());
+ipcMain.on('cpu-temperature', async event => {
+  event.returnValue = await getCPUTenperature()
+});
+
+const getOutdoorTemperature = () => {
+  // 
+}
+
+ipcMain.on('outdoor-temperature', async event => {
+  event.returnValue = await getOutdoorTemperature()
+});
