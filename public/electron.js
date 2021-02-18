@@ -1,8 +1,9 @@
-const electron = require("electron")
+const electron = require('electron')
 const app = electron.app
+const ipcMain = electron.ipcMain
 const BrowserWindow = electron.BrowserWindow
-const path = require("path")
-const isDev = require("electron-is-dev")
+const path = require('path')
+const isDev = require('electron-is-dev')
 const singleInstanceLock = app.requestSingleInstanceLock()
 const si = require('systeminformation')
 require('osx-temperature-sensor') // systeminformation (si) dependency above will pick it up internally, but still needs requiring (electron-rebuild purposes)
@@ -28,7 +29,7 @@ const createWindow = () => {
     width: 400, 
     height: 300,
     maximizable: false,
-    backgroundColor: '#282C34',
+    backgroundColor: '#f1f1f1',
     show: false,
     webPreferences: {
       nodeIntegration: true
@@ -48,12 +49,6 @@ const createWindow = () => {
   if (isDev) {
     // Open Console in development mode
     mainWindow.webContents.openDevTools()
-
-    /* testing si */
-    si.cpuTemperature()
-      .then(data => console.log(data))
-      .catch(error => console.error(error));
-
   }
 }
 
@@ -70,3 +65,11 @@ app.on("activate", () => {
     createWindow()
   }
 })
+
+ipcMain.handle('cpu-temperature', (event, arg) => si.cpuTemperature()
+  .then(data => data)
+  .catch(error => {
+    console.error(error)
+    return null;
+  })
+)
