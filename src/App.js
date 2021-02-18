@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react'
+import * as RB from 'react-bootstrap'
 const ipcRenderer = window.require('electron').ipcRenderer;
 
 const App = () => {
@@ -8,7 +9,8 @@ const App = () => {
   const getCPUTemperature = async () => {
     try {
       const result = await ipcRenderer.invoke('cpu-temperature', null);
-      setTemperature(result);
+      setTemperature(result)
+      setError(null)
       setTimeout(getCPUTemperature, 5000)
     } catch (error) {
       console.error(error);
@@ -19,12 +21,12 @@ const App = () => {
 
   useEffect(() => {
     getCPUTemperature()
-  }, []);
+  }, [])
 
-  return (<div>
+  return (<RB.Container className="m-0 p-3">
     <pre>{JSON.stringify(temperature, null, 2)}</pre>
-    {error && <div className="error">{error}</div>}
-  </div>)
+    {error ? <RB.Alert variant="danger" className="fixed-bottom m-0">{error}</RB.Alert> : ''}
+  </RB.Container>)
 }
 
 export default App
