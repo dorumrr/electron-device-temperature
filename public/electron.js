@@ -4,6 +4,9 @@ const BrowserWindow = electron.BrowserWindow
 const path = require("path")
 const isDev = require("electron-is-dev")
 const singleInstanceLock = app.requestSingleInstanceLock()
+const si = require('systeminformation')
+require('osx-temperature-sensor') // systeminformation (si) dependency above will pick it up internally, but still needs requiring (electron-rebuild purposes)
+
 let mainWindow
 
 if (!singleInstanceLock) {
