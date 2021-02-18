@@ -30,6 +30,9 @@ const createWindow = () => {
     maximizable: false,
     backgroundColor: '#282C34',
     show: false,
+    webPreferences: {
+      nodeIntegration: true
+  }
   })
   mainWindow.loadURL(
     isDev
