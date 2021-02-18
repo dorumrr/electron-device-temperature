@@ -45,6 +45,12 @@ const createWindow = () => {
   if (isDev) {
     // Open Console in development mode
     mainWindow.webContents.openDevTools()
+
+    /* testing si */
+    si.cpuTemperature()
+      .then(data => console.log(data))
+      .catch(error => console.error(error));
+
   }
 }
 
