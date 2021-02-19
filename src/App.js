@@ -6,17 +6,23 @@ const ipcRenderer = window.require('electron').ipcRenderer
 
 const App = () => {
   const [cpuTemperature, setCpuTemperature] = useState(0)
+  const [cpuTemperatureError, setCpuTemperatureError] = useState(null)
   const [outdoorTemperature, setOutdoorTemperature] = useState(0)
-  const [error, setError] = useState(null)
+  const [outdoorTemperatureError, setOutdoorTemperatureError] = useState(null)
 
   const getCpuTemperature = async () => {
     try {
       const result = await ipcRenderer.sendSync('cpu-temperature')
-      setCpuTemperature(result)
-      setTimeout(getCpuTemperature, 5000)
+      if (result === 'error' || !Number(result)) {
+        setCpuTemperatureError('Could not read CPU Temperature due to a system limitation')
+      } else {
+        setCpuTemperature(result)
+        setCpuTemperatureError(null)
+        setTimeout(getCpuTemperature, 10000)
+      }
     } catch (e) {
       console.error(e)
-      setError('Could not read CPU Temperature, retrying...')
+      setCpuTemperatureError('Could not read CPU Temperature, retrying...')
       setTimeout(getCpuTemperature, 10000)
     }
   }
@@ -25,31 +31,36 @@ const App = () => {
     try {
       const result = await ipcRenderer.sendSync('outdoor-temperature')
       if (result === 'error' || !Number(result)) {
-        setError('Could not get Outdoor Temperature, retrying...')
+        setOutdoorTemperatureError('Could not get Outdoor Temperature due to malformed API response')
       } else {
         setOutdoorTemperature(result)
+        setOutdoorTemperatureError(null)
+        setTimeout(getOutdoorTemperature, 1000 * 60 * 30) // 30 minutes
       }
-      setTimeout(getOutdoorTemperature, 1000 * 60 * 30) // 30 minutes
     } catch (e) {
       console.error(e)
-      setError('Could not get Outdoor Temperature, retrying...')
+      setOutdoorTemperatureError('Could not get Outdoor Temperature, retrying...')
       setTimeout(getCpuTemperature, 1000 * 60) // 1 minute
     }
   }
 
+  const quitApp = () => {
+    ipcRenderer.send('quit-app') 
+  }
+
   useEffect(() => {
-    getOutdoorTemperature()
     getCpuTemperature()
+    getOutdoorTemperature()
   }, [])
 
-  return (<div className="bg-dark m-0 p-4">
-    <div className="d-flex justify-content-around bg-dark ml-1">
+  return (<div className="bg-dark m-0 p-4" style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0 }}>
+    <div className="d-flex justify-content-around bg-dark ml-1 mt-3">
 
       <div>
         <div className="ml-2">
           <Thermometer
             theme="dark"
-            value={(cpuTemperature && Math.round(cpuTemperature.main)) || 0}
+            value={cpuTemperature}
             max="130"
             format="°C"
             size="large"
@@ -63,7 +74,7 @@ const App = () => {
         <div className="ml-4">
           <Thermometer
             theme="dark"
-            value={outdoorTemperature || 0}
+            value={outdoorTemperature}
             max="50"
             format="°C"
             size="large"
@@ -74,7 +85,12 @@ const App = () => {
       </div>
 
     </div>
-    {error ? <RB.Alert variant="danger" dismissible onClick={() => setError(null)} className="fixed-top m-2">{error}</RB.Alert> : ''}
+
+    <div className="d-flex justify-content-around mt-3">
+      <RB.Button variant="danger" size="sm" onClick={() => quitApp()}>QUIT</RB.Button>
+    </div>
+    {cpuTemperatureError ? <RB.Alert variant="danger" dismissible onClick={() => setCpuTemperatureError(null)} className="fixed-top m-2">{cpuTemperatureError}</RB.Alert> : ''}
+    {outdoorTemperatureError ? <RB.Alert variant="danger" dismissible onClick={() => setOutdoorTemperatureError(null)} className="fixed-top m-2">{outdoorTemperatureError}</RB.Alert> : ''}
   </div>)
 }
 
