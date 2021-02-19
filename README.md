@@ -12,7 +12,9 @@ npm v7.5.3
 
 Clone the repository
 
-Run `npm install` 
+OSX: `npm run dev-setup-osx`
+
+Windows: `npm run dev-setup-win`
 
 Run `npm start`
 ## Build 
