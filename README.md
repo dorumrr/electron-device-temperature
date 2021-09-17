@@ -1,6 +1,6 @@
 # Electron Device Temperature
 
-`Note: This project is part of a interview test`
+`Note: This project is just a proof of concept`
 
 This electron app reads the current CPU temperature from the device is running on and also gets the outdoor temperature from a public weather API
 
